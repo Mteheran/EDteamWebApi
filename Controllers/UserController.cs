@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using WebApiRoutesResponses.Context;
+using WebApiRoutesResponses.Models;
 using WebApiRoutesResponses.Services;
 
 namespace WebApiRoutesResponses.Controllers
@@ -14,48 +16,76 @@ namespace WebApiRoutesResponses.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        IUserDataService userDataService;
-
-        public UserController(IUserDataService userData)
+        ApiAppContext apiContext;
+        public UserController(ApiAppContext context)
         {
-            userDataService = userData;
+            apiContext = context;
+            apiContext.Database.EnsureCreated();
         }
        
-        public ActionResult<IEnumerable<string>> Get([FromServices] IUserDataService dataService)
+        [HttpGet]
+        public ActionResult<IEnumerable<User>> Get()
         {
-            return userDataService.GetValues().Union(dataService.GetValues()).ToList();
+            return apiContext.Users.Where(p=> p.Active).ToList();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<string> Get(string id)
         {
-           if(id > 0)
+
+           Guid.TryParse(id, out var userId);
+
+           if(userId != Guid.Empty)
            {
-               return "Value";
-           }
-           else if(id < 0)
-           {
-               return BadRequest();
+               var userFound  = apiContext.Users.FirstOrDefault(p=> p.UserId == userId);
+
+                if(userFound!=null)
+                    return Ok(userFound);
+                else
+                    return NotFound();
            }
            else
-           {
-               return NotFound();
-           }
+               return BadRequest();
         }
 
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
+        [HttpPost]
+        public async Task Post([FromBody] User value)
+        {
+            apiContext.Users.Add(value);
+            await apiContext.SaveChangesAsync();
+        }
 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(string id, [FromBody] User value)
         {
+           Guid.TryParse(id, out var userId);
+
+           if(userId != Guid.Empty)
+           {
+               var userFound = apiContext.Users.FirstOrDefault(p=> p.UserId == userId);
+
+               if(userFound!= null)
+               {
+                   userFound.Name = value.Name;
+                   userFound.LastName = value.Name;
+                   userFound.Active = value.Active;
+                   apiContext.SaveChanges();
+               }
+           }
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task Delete(string id)
         {
+            Guid.TryParse(id, out var userId);
+
+           if(userId != Guid.Empty)
+           {
+               var userFound  = apiContext.Users.FirstOrDefault(p=> p.UserId == userId);
+
+                apiContext.Users.Remove(userFound);
+                await apiContext.SaveChangesAsync();
+           }
         }
     }
 }
