@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApiRoutesResponses.Context;
 using WebApiRoutesResponses.Models;
 using WebApiRoutesResponses.Services;
@@ -13,6 +14,7 @@ namespace WebApiRoutesResponses.Controllers
 {
     [EnableCors("MyPolicy")]
     [Route("api/[controller]")]
+    //[ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -26,7 +28,14 @@ namespace WebApiRoutesResponses.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<User>> Get()
         {
-            return apiContext.Users.Where(p=> p.Active).ToList();
+            return apiContext.Users.Where(p=> p.Active).Include(p=> p.UserRoles).ToList();
+        }
+
+        [HttpGet]
+        [Route("GetRoles")]
+        public ActionResult<IEnumerable<UserRole>> GetRoles()
+        {
+            return apiContext.UserRoles.Include(p=> p.User).ToList();
         }
 
         [HttpGet("{id}")]

@@ -13,7 +13,11 @@ namespace WebApiRoutesResponses.Models
 
         public string LastName {get;set;}
 
+        public string Phone {get;set;}
+
         public DateTime DateCreated {get;set;} = DateTime.Now;
+
+        public virtual  ICollection<UserRole> UserRoles {get;set;}
 
         public bool Active {get;set;}  = true;
     }

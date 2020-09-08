@@ -41,7 +41,9 @@ namespace WebApiRoutesResponses
                 //                .RequireAuthenticatedUser()
                 //                .Build();
                 //config.Filters.Add(new AuthorizeFilter(policy));
-            });
+            }).AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             services.AddScoped<IUserDataService,UserDataService>();
             services.AddCors(p=>
@@ -76,9 +78,13 @@ namespace WebApiRoutesResponses
                     };
             });  
 
+            //services.AddDbContext<ApiAppContext>(options =>
+            // options.UseInMemoryDatabase("AppDB"));
+            
+            // using Microsoft.EntityFrameworkCore;
             services.AddDbContext<ApiAppContext>(options =>
-             options.UseInMemoryDatabase("AppDB"));
-                 
+                options.UseSqlServer(@"Data Source=MTEHERAN\LOCALDB;Initial Catalog=EDteamApi;Integrated Security=SSPI;"));
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -97,7 +103,7 @@ namespace WebApiRoutesResponses
 
             //app.UseAuthentication();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
