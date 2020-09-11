@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiRoutesResponses.Context;
@@ -39,7 +40,11 @@ namespace WebApiRoutesResponses.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<string> Get(string id)
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]        
+        public ActionResult<User> Get(string id)
         {
 
            Guid.TryParse(id, out var userId);
