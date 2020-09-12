@@ -21,6 +21,10 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebApiRoutesResponses.Context;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNet.OData.Extensions;
+using Microsoft.OData.Edm;
+using Microsoft.AspNet.OData.Builder;
+using WebApiRoutesResponses.Models;
 
 namespace WebApiRoutesResponses
 {
@@ -38,6 +42,7 @@ namespace WebApiRoutesResponses
         {
             services.AddControllers(config =>
             {
+                config.EnableEndpointRouting = false;
                 //var policy = new AuthorizationPolicyBuilder()
                 //                .RequireAuthenticatedUser()
                 //                .Build();
@@ -110,7 +115,7 @@ namespace WebApiRoutesResponses
                 });
             });
 
-            
+            services.AddOData();
             
         }
 
@@ -146,16 +151,24 @@ namespace WebApiRoutesResponses
 
             //app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
+            app.UseMvc(routeBuilder =>
             {
-                endpoints.MapControllers();
-
-                endpoints.MapGet("/MyRoot", async context => 
-                {   
-                   await context.Response.WriteAsync("Hola desde myroot");
-
-                });
+                routeBuilder.Expand().Select().OrderBy().Filter();
+                routeBuilder.EnableDependencyInjection();
+                routeBuilder.MapODataServiceRoute("odata", "odata", GetEdmModel());
             });
+
+
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapControllers();
+
+            //    endpoints.MapGet("/MyRoot", async context => 
+            //    {   
+            //       await context.Response.WriteAsync("Hola desde myroot");
+
+            //    });
+            //});
 
             app.UseWelcomePage();
             
@@ -166,6 +179,14 @@ namespace WebApiRoutesResponses
             //{
             //    await context.Response.WriteAsync("URL no encontrada");
             //});
+        }
+
+         IEdmModel GetEdmModel()
+        {
+            var odataBuilder = new ODataConventionModelBuilder();
+            odataBuilder.EntitySet<User>("Users");
+
+            return odataBuilder.GetEdmModel();
         }
     }
 }

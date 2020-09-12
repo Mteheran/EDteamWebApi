@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -27,9 +28,10 @@ namespace WebApiRoutesResponses.Controllers
         }
        
         [HttpGet]
-        public ActionResult<IEnumerable<User>> Get()
+        [EnableQuery()]
+        public ActionResult<IQueryable<User>> Get()
         {
-            return apiContext.Users.Where(p=> p.Active).Include(p=> p.UserRoles).ToList();
+            return Ok(apiContext.Users.Where(p=> p.Active));
         }
 
         [HttpGet]
