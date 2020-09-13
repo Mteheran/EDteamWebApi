@@ -29,9 +29,9 @@ namespace WebApiRoutesResponses.Controllers
        
         [HttpGet]
         [EnableQuery()]
-        public ActionResult<IQueryable<User>> Get()
+        public IEnumerable<User> Get()
         {
-            return Ok(apiContext.Users.Where(p=> p.Active));
+            return apiContext.Users.Where(p=> p.Active).ToList();
         }
 
         [HttpGet]
