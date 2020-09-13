@@ -26,14 +26,20 @@ namespace WebApiRoutesResponses.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            throw new Exception("Exception test");
             var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            _logger.LogError("GET WeatherForecast");
+            var lst =  Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+
+            _logger.LogInformation(lst.Count().ToString());
+
+            return lst;
         }
     }
 }

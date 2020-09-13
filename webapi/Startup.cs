@@ -124,7 +124,12 @@ namespace WebApiRoutesResponses
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
+                app.UseExceptionHandler("/error");
+            }
+            else
+            {
+              
             }
 
             app.UseSwagger(c =>
