@@ -35,7 +35,7 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'webapidemo2020'
+        app-name: 'WebApiEDteam'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_01b069bc46ee4aa6afa85fa5b956315b }}
         package: ${{env.DOTNET_ROOT}}/myapp 
